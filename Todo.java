@@ -12,14 +12,12 @@ public class Todo {
     static {
         try {
             loadFile();
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             System.out.println("Error loading file: " + e.getMessage());
         }
-//        loadFile();
     }
 
-    public static void main(String arg[]) throws URISyntaxException {
-        loadFile();
+    public static void main(String arg[]) {
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to your favourite To-do App.");
@@ -55,7 +53,7 @@ public class Todo {
                     for (String instruction : instructions) {
                         System.out.println(instruction);
                     }
-                    break label;
+                    break;
                 case "2":
                     if (Todo.storage.size() == 0) {
                         System.out.println("No task has been added yet...");
@@ -167,13 +165,12 @@ public class Todo {
 
     }
 
-    private static void loadFile() throws URISyntaxException {
+    private static void loadFile() {
         // checking if file.txt exists,if not, create new file.txt
-        if (InputStream.class.getResourceAsStream("file.txt") == null) {
+        Path path = Paths.get("file.txt");
+        if (!Files.exists(path)) {
             System.out.println("file.txt does not exist. Creating file.txt...");
-            //System.out.println(Paths.get(Objects.requireNonNull(InputStream.class.getResource("/")).toURI()).resolve("file.txt"));
             try {
-                Path path = Paths.get(Objects.requireNonNull(InputStream.class.getResource("/")).toURI()).resolve("file.txt");
                 Files.createFile(path);
                 System.out.println("file.txt created successfully.");
             } catch (Exception e) {
@@ -182,34 +179,32 @@ public class Todo {
         } else {
             System.out.println("file.txt already exists.");
             try {
-                Path path = Paths.get(Objects.requireNonNull(InputStream.class.getResource("/")).toURI()).resolve("file.txt");
                 List<String> lines = Files.readAllLines(path);
                 //id, name, status
+                Todo.storage.clear();
                 for (String line : lines) {
                     String[] parts = line.split(",");
                     if (parts.length == 3) {
                         int id = Integer.parseInt(parts[0].trim());
                         String title = parts[1].trim();
-                        TaskStatus status = TaskStatus.valueOf(parts[1].trim().toUpperCase());
+                        TaskStatus status = TaskStatus.valueOf(parts[2].trim().toUpperCase());
                         Task task = new Task();
                         task.id = id;
                         task.title = title;
                         task.status = status;
                         Todo.storage.add(task);
                     }
-                    System.out.println("Task loaded successfully.");
                 }
+                System.out.println("Tasks loaded successfully.");
             } catch (Exception e) {
                 System.out.println("Error reading file.txt: " + e.getMessage());
             }
-
-
         }
     }
 
     private static void saveToFile() {
         try {
-            Path path = Paths.get(Objects.requireNonNull(InputStream.class.getResource("/")).toURI()).resolve("file.txt");
+            Path path = Paths.get("file.txt");
             List<String> lines = new ArrayList<>();
             for (Task task : Todo.storage) {
                 lines.add(task.id + "," + task.title + "," + task.status);
@@ -223,9 +218,10 @@ public class Todo {
 
     private static void addTask(Task task) {
         try {
-            Path path = Paths.get(Objects.requireNonNull(InputStream.class.getResource("/")).toURI()).resolve("file.txt");
+            Path path = Paths.get("file.txt");
             String line = task.id + "," + task.title + "," + task.status;
             Files.write(path, Collections.singletonList(line), StandardOpenOption.APPEND);
+            Todo.storage.add(task);
             System.out.println("Task added successfully.");
         }catch (Exception e) {
             System.out.println("Error adding task: " + e.getMessage());
@@ -233,7 +229,7 @@ public class Todo {
     }
     private static void deleteTask(int taskId) {
         try {
-            Path path = Paths.get(Objects.requireNonNull(InputStream.class.getResource("/")).toURI()).resolve("file.txt");
+            Path path = Paths.get("file.txt");
             List<String> lines = Files.readAllLines(path);
             List<String> updatedLines = new ArrayList<>();
             for (String line : lines) {
@@ -256,7 +252,7 @@ public class Todo {
     }
     private static void updateTaskStatus(int taskId, TaskStatus newStatus) {
         try {
-            Path path = Paths.get(Objects.requireNonNull(InputStream.class.getResource("/")).toURI()).resolve("file.txt");
+            Path path = Paths.get("file.txt");
             List<String> lines = Files.readAllLines(path);
             List<String> updatedLines = new ArrayList<>();
             for (String line : lines) {
@@ -280,7 +276,7 @@ public class Todo {
 
     private static List<Task> getTasks() {
         try {
-            Path path = Paths.get(Objects.requireNonNull(InputStream.class.getResource("/")).toURI()).resolve("file.txt");
+            Path path = Paths.get("file.txt");
             List<String> lines = Files.readAllLines(path);
             List<Task> tasks = new ArrayList<>();
             for (String line : lines) {
