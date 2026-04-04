@@ -1,5 +1,4 @@
-import java.io.InputStream;
-import java.net.URISyntaxException;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,31 +28,34 @@ public class Todo {
         System.out.println("Press 4 - to Delete Task");
         System.out.println("Press 5 - to Exit");
 
-        String[] instructions = {"Wanna do more?...", "Press 1 - to Add Task", "Press 2 - to View Tasks", "Press 3 - Change Task Status", "Press 4 - to Delete Task", "Press 5 - to Exit"};
-        label:
-        while (scanner.hasNext()) {
+        String[] instructions = { "Wanna do more?...", "Press 1 - to Add Task", "Press 2 - to View Tasks",
+                "Press 3 - Change Task Status", "Press 4 - to Delete Task", "Press 5 - to Exit" };
+        // label:
+        label: while (true) {
             String input = scanner.next();
             input = input.trim();
             switch (input) {
                 case "1":
                     System.out.println("Enter the task title:");
                     String title = scanner.next();
-                    while (title.isBlank()) {
-                        System.out.println("Task title cannot be empty. Please enter a valid task title:");
-                        title = scanner.next();
-                    }
+                    // while (title.isEmpty()) {
+                    // System.out.println("Task title cannot be empty. Please enter a valid task
+                    // title:");
+                    // title = scanner.next();
+                    // }
                     Task newTask = new Task();
                     newTask.addTask(title);
-//                    .add(task);
+                    // .add(task);
                     addTask(newTask);
-
 
                     System.out.println(newTask.toString());
                     System.out.println("New task successfully added...");
+
                     for (String instruction : instructions) {
                         System.out.println(instruction);
                     }
                     break;
+
                 case "2":
                     if (Todo.storage.size() == 0) {
                         System.out.println("No task has been added yet...");
@@ -61,10 +63,10 @@ public class Todo {
                     } else {
                         System.out.println("Your task list is shown below.");
 
-//                        for (Task task : Todo.storage) {
-//                            System.out.println(task);
-//                        }
-//                        getTasks().forEach(System.out::println);
+                        // for (Task task : Todo.storage) {
+                        // System.out.println(task);
+                        // }
+                        // getTasks().forEach(System.out::println);
                         getTasks().forEach((task) -> System.out.println(task.toString()));
                         for (int i = 0; i < instructions.length; i++) {
                             if (i == 2) {
@@ -87,10 +89,12 @@ public class Todo {
                         while (iterator.hasNext()) {
                             Task task = iterator.next();
                             if (task.id == inputId) {
-                                task.status = task.status.equals(TaskStatus.COMPLETED) ? TaskStatus.NOT_COMPLETED : TaskStatus.COMPLETED;
+                                task.status = task.status.equals(TaskStatus.COMPLETED) ? TaskStatus.NOT_COMPLETED
+                                        : TaskStatus.COMPLETED;
                                 found = true;
                                 updateTaskStatus(inputId, task.status);
-                                System.out.println("Task ID " + task.id + "- marked " + task.status.toString().toLowerCase() + " ...");
+                                System.out.println("Task ID " + task.id + "- marked "
+                                        + task.status.toString().toLowerCase() + " ...");
                                 for (String instruction : instructions) {
                                     System.out.println(instruction);
                                 }
@@ -180,7 +184,7 @@ public class Todo {
             System.out.println("file.txt already exists.");
             try {
                 List<String> lines = Files.readAllLines(path);
-                //id, name, status
+                // id, name, status
                 Todo.storage.clear();
                 for (String line : lines) {
                     String[] parts = line.split(",");
@@ -223,10 +227,11 @@ public class Todo {
             Files.write(path, Collections.singletonList(line), StandardOpenOption.APPEND);
             Todo.storage.add(task);
             System.out.println("Task added successfully.");
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Error adding task: " + e.getMessage());
         }
     }
+
     private static void deleteTask(int taskId) {
         try {
             Path path = Paths.get("file.txt");
@@ -245,11 +250,12 @@ public class Todo {
             Files.write(path, updatedLines);
             System.out.println("Task deleted successfully.");
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Error deleting task: " + e.getMessage());
         }
 
     }
+
     private static void updateTaskStatus(int taskId, TaskStatus newStatus) {
         try {
             Path path = Paths.get("file.txt");
@@ -293,7 +299,7 @@ public class Todo {
                 }
             }
             return tasks;
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Error reading tasks: " + e.getMessage());
             return Collections.emptyList();
         }
